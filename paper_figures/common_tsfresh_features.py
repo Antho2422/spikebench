@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
-from spikebench import load_allen, load_fcx1, load_temporal, load_retina
+from spikebench import load_allen, load_fcx1, load_temporal, load_retina, load_epirest
 from spikebench.helpers import set_random_seed, tsfresh_vectorize
 
 DATASET_NAME_LOADER_MAP = {

@@ -13,7 +13,7 @@ from pyts.metrics import dtw
 from sklearn.metrics import cohen_kappa_score, roc_auc_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
-from spikebench import load_allen, load_fcx1, load_retina, load_temporal
+from spikebench import load_allen, load_fcx1, load_retina, load_temporal, load_epirest
 from spikebench.helpers import set_random_seed, subsampled_fit_predict
 
 DATASET_NAME_LOADER_MAP = {
@@ -21,6 +21,7 @@ DATASET_NAME_LOADER_MAP = {
     'retina': load_retina,
     'allen': load_allen,
     'fcx1_temporal': load_temporal,
+    'epirest': load_epirest,
 }
 
 

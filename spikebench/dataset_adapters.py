@@ -33,6 +33,16 @@ def fcx1_dataset(file):
         spikes['series'].append(np.array(series))
     return spikes_dict_to_df(spikes)
 
+def epirest_dataset(file):
+    spikes = {'groups': [], 'series': []}
+
+    data = pd.read_csv(file)
+    for neuron_id in data.columns.values:
+        spikes['groups'].append(neuron_id)
+        series = [float(value) for value in data[neuron_id].values[0].split()]
+        spikes['series'].append(np.array(series))
+    return spikes_dict_to_df(spikes)
+
 
 def spikes_dict_to_df(spikes_dict):
     def stringify(array):

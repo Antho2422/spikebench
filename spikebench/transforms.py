@@ -45,12 +45,16 @@ class TrainNormalizeTransform(TransformerMixin, NoFitMixin):
         target = np.array([])
         groups = np.array([])
         for train_index, spike_train in enumerate(X.series.values):
+            # Convert string to float series
             spike_train = self.string_to_float_series(spike_train, delimiter=delimiter)
+            # Split spike train into chunks of window size with window size - step overlap
             split_chunks = self.rolling_window(
                 spike_train, window=self.window, step=self.step
             )
+            # stack vertically each chunk for each spike train
             if split_chunks is not None:
                 normalized_trains = np.vstack([normalized_trains, split_chunks])
+                # create target and groups vectors to keep track of the original spike train and label
                 target = np.append(target, [y[train_index]] * split_chunks.shape[0])
                 groups = np.append(
                     groups, [X.groups[train_index]] * split_chunks.shape[0]

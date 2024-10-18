@@ -10,14 +10,15 @@ import pandas as pd
 from imblearn.metrics import geometric_mean_score
 from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import cohen_kappa_score, roc_auc_score
+from sklearn.metrics import cohen_kappa_score, roc_auc_score, f1_score, accuracy_score, precision_recall_curve
 from sklearn.preprocessing import StandardScaler
-from spikebench import load_allen, load_fcx1, load_retina, load_temporal
+from spikebench import load_allen, load_fcx1, load_retina, load_temporal, load_epirest
 from spikebench.helpers import (set_random_seed, subsampled_fit_predict,
                                 tsfresh_vectorize)
 from xgboost import XGBClassifier
 
 DATASET_NAME_LOADER_MAP = {
+    'epirest': load_epirest,
     'fcx1': load_fcx1,
     'retina': load_retina,
     'allen': load_allen,
@@ -91,9 +92,9 @@ model_zoo = {
 @chika.config
 class Config:
     seed: int = 0
-    dataset: str = 'retina'
+    dataset: str = 'epirest'
     balanced: bool = False
-    preprocessing: bool = False
+    preprocessing: bool = True
     train_subsample_factor: float = 0.7
     test_subsample_factor: float = 0.7
     trials: int = 5
@@ -117,6 +118,9 @@ def main(cfg: Config):
 
         loader_fn = DATASET_NAME_LOADER_MAP[cfg.dataset]
         X_train, X_test, y_train, y_test, gr_train, gr_test = loader_fn(random_seed=cfg.seed)
+        
+        pd.Series(gr_train).to_csv(f'{cfg.out_folder}/{cfg.dataset}_train_groups.csv', index=False)
+        pd.Series(gr_test).to_csv(f'{cfg.out_folder}/{cfg.dataset}_test_groups.csv', index=False)
 
         if cfg.preprocessing:
             X_train = np.log1p(X_train)
@@ -141,7 +145,7 @@ def main(cfg: Config):
             results = subsampled_fit_predict(models, X_train, X_test, y_train, y_test, cfg)
             results.to_csv(f'{cfg.out_folder}/{cfg.dataset}_{feature_set}_tsfresh_balanced.csv', index=False)
         else:
-            results = {'model_name': [], 'roc_auc': [], 'gmean': [], 'cohen_kappa': []}
+            results = {'model_name': [], 'roc_auc': [], 'accuracy': [], 'gmean': [], 'cohen_kappa': []}
             for model_name, model in models.items():
 
                 logging.info(f'Fitting model {model_name}')
@@ -151,6 +155,7 @@ def main(cfg: Config):
 
                 results['model_name'].append(model_name)
                 results['roc_auc'].append(roc_auc_score(y_test, test_probas))
+                results['accuracy'].append(accuracy_score(y_test, test_preds))
                 results['gmean'].append(geometric_mean_score(y_test, test_preds))
                 results['cohen_kappa'].append(cohen_kappa_score(y_test, test_preds))
 

@@ -9,7 +9,7 @@ from imblearn.metrics import geometric_mean_score
 from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import cohen_kappa_score, roc_auc_score
-from spikebench import load_allen, load_fcx1, load_temporal, load_retina
+from spikebench import load_allen, load_fcx1, load_temporal, load_retina, load_epirest
 from spikebench.helpers import (set_random_seed, subsampled_fit_predict,
                                 tsfresh_vectorize_spike_count)
 from xgboost import XGBClassifier
@@ -19,6 +19,7 @@ DATASET_NAME_LOADER_MAP = {
     'retina': load_retina,
     'allen': load_allen,
     'fcx1_temporal': load_temporal,
+    'epirest': load_epirest,
 }
 
 
@@ -77,7 +78,7 @@ model_zoo = {
 @chika.config
 class Config:
     seed: int = 0
-    dataset: str = 'retina'
+    dataset: str = 'epirest'
     balanced: bool = False
     preprocessing: bool = True
     train_subsample_factor: float = 0.7
@@ -86,7 +87,7 @@ class Config:
     tsfresh_feature_set: str = None
     tsfresh_remove_low_variance: bool = True
     tsfresh_scale_features: bool = True
-    bin_size: int = 4000
+    bin_size: int = 200
     out_folder: str = 'csv'
 
 
